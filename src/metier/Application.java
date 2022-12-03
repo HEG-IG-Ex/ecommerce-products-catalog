@@ -20,8 +20,6 @@ public class Application {
         bdd.getCollection("products").drop();
         bdd.createCollection("products");
 
-
-        System.out.println("Working Directory = " + System.getProperty("user.dir"));
         loadMovies();
         loadAlbums();
         loadBooks();

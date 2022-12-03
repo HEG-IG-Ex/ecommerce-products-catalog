@@ -75,10 +75,10 @@ public class DataLoader {
                         .append("buying_price",p.getBuyingPrice())
                         .append("discount",p.getDiscount())
                 )
-                .append("authors", book[2])
-                .append("average_rating", Double.parseDouble(book[3]))
-                .append("isbn", Integer.parseInt(book[4]))
-                .append("isbn13", Long.parseLong(book[5]))
+                .append("authors", Arrays.asList(book[2].split("/")))
+                .append("average_rating", parseDoubleStringWithComma(book[3]))
+                .append("isbn", book[4])
+                .append("isbn13",book[5])
                 .append("language_code", book[6])
                 .append("num_pages", Integer.parseInt(book[7]))
                 .append("ratings_count", Integer.parseInt(book[8]))
@@ -106,7 +106,7 @@ public class DataLoader {
     }
 
     public static Date parseStringForDate(String value) {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE);
+        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy", Locale.FRANCE);
         Date d = null;
         try{
             d = formatter.parse(value);
@@ -157,8 +157,11 @@ public class DataLoader {
                 .append("metascore", parseDoubleStringWithComma(movie[8]))
                 .append("direction", movie[9])
                 .append("cast", Arrays.asList(movie[10], movie[11], movie[12], movie[13]))
-                .append("noOfVotes", Integer.parseInt(movie[14]))
-                .append("gross", movie[15] == "" ? 0 : movie[15]);
+                .append("noOfVotes", Integer.parseInt(movie[14]));
+
+                if(Integer.parseInt(movie[15]) > 0){
+                    d.append("gross", Integer.parseInt(movie[15]));
+                }
         return d;
     }
 
