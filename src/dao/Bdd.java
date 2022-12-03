@@ -55,7 +55,7 @@ public class Bdd {
 
     public static MongoCollection<Document> getCollection(String collectionName){
         if(databaseIsReady()){
-""            return database.getCollection(collectionName);
+            return database.getCollection(collectionName);
         }
         return null;
     }

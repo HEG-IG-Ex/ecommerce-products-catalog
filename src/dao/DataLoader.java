@@ -8,7 +8,9 @@ import org.bson.types.ObjectId;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Locale;
 
 public class DataLoader {
@@ -27,6 +29,65 @@ public class DataLoader {
 
     public static int generateRandomIntInRange(int min, int max){return (int)(Math.random()*(max-min+1)+min);}
 
+    public static Pricing generatePricingBook(){
+        return new Pricing(
+                generateRandomIntInRange(10, 60),
+                generateRandomIntInRange(1, 10),
+                Math.random()
+        );
+    }
+
+    public static Shipping generateShippingBook(){
+        return new Shipping(
+                Math.random() + 0.3,
+                191,
+                136,
+                15
+        );
+    }
+
+    public static Document buildBookDocument(Pricing p, Shipping s, String[] book) {
+        /*
+        bookID
+        title
+        authors
+        average_rating
+        isbn
+        isbn13
+        language_code
+        num_pages
+        ratings_count
+        text_reviews_count
+        publication_date
+        publisher
+        */
+        Document d = new Document()
+                .append("type", "book")
+                .append("title", book[1])
+                .append("description", "")
+                .append("shipping", new Document()
+                        .append("weight",s.getWeight())
+                        .append("width",s.getWidth())
+                        .append("heigth",s.getHeigth())
+                        .append("depth",s.getDepth()))
+                .append("pricing", new Document()
+                        .append("selling_price",p.getSellingPrice())
+                        .append("buying_price",p.getBuyingPrice())
+                        .append("discount",p.getDiscount())
+                )
+                .append("authors", book[2])
+                .append("average_rating", Double.parseDouble(book[3]))
+                .append("isbn", Integer.parseInt(book[4]))
+                .append("isbn13", Long.parseLong(book[5]))
+                .append("language_code", book[6])
+                .append("num_pages", Integer.parseInt(book[7]))
+                .append("ratings_count", Integer.parseInt(book[8]))
+                .append("text_reviews_count", Integer.parseInt(book[9]))
+                .append("publication_date", parseStringForDate(book[10]))
+                .append("publisher", book[11]);
+        return d;
+    }
+
     public static Pricing generatePricingMovie(){
         return new Pricing(
                 generateRandomIntInRange(10, 30),
@@ -44,26 +105,35 @@ public class DataLoader {
         );
     }
 
+    public static Date parseStringForDate(String value) {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE);
+        Date d = null;
+        try{
+            d = formatter.parse(value);
+        }catch(ParseException pe){
+            pe.printStackTrace();
+        }finally {
+            return d;
+        }
+    }
+
     public static double parseDoubleStringWithComma(String value){
         NumberFormat format = NumberFormat.getInstance(Locale.FRANCE);
+        double d = 0.0;
         try{
             Number number = format.parse(value);
-            double d = number.doubleValue();
-            return d;
-        }catch(ParseException pe)
-        {
+            d = number.doubleValue();
+        }catch(ParseException pe){
             pe.printStackTrace();
-            return -1.0;
+            d = -1.0;
+        }finally {
+            return d;
         }
     }
 
     public static Document buildMovieDocument(Pricing p, Shipping s, String[] movie) {
-
-        if(movie[1] == "Hamilton"){
-            System.out.println("error");
-        }
-
         Document d = new Document()
+                .append("type", "movie")
                 .append("title", movie[1])
                 .append("description", movie[7])
                 .append("shipping", new Document()
@@ -92,7 +162,6 @@ public class DataLoader {
         return d;
     }
 
-
     public static void loadMovies() {
 
         bdd = Bdd.getInstance();
@@ -107,7 +176,15 @@ public class DataLoader {
     }
 
     public static void loadBooks() {
+
+        bdd = Bdd.getInstance();
+        MongoCollection products = bdd.getCollection("products");
+
         String[][] booksFromCsv = readBooks();
+        for (int i = 1; i < booksFromCsv.length; i++) {
+            Document d = buildBookDocument(generatePricingBook(), generateShippingBook(), booksFromCsv[i]);
+            products.insertOne(d);
+        }
     }
 
     public static void loadAlbums() {
