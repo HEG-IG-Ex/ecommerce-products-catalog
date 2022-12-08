@@ -1,10 +1,15 @@
 package metier;
 
+import com.mongodb.client.MongoCollection;
 import dao.Bdd;
 import domaine.Product;
 import domaine.ProductType;
+import org.bson.BsonDocument;
+import org.bson.Document;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,12 +33,38 @@ public class Application {
         loadBooks();
         loadVideoGames();
 
+        bdd.closeClient();
+
         //SRC : https://www.freecodecamp.org/news/mongodb-aggregation-framework/
         //SRC : https://kinsta.com/blog/mongodb-operators/
+        //SRC : https://stackoverflow.com/questions/39320825/pojo-to-org-bson-document-and-vice-versa
+        //SRC : https://mongodb.github.io/mongo-java-driver/3.9/driver/getting-started/quick-start-pojo/
+        //SRC : https://www.mongodb.com/developer/languages/java/java-aggregation-pipeline/
+
     }
 
+    private List<Document> buildAggregationPipeline(){
+        Document project = new Document("$project",
+                new Document("Genre", "$genres")
+                        .append("title", 1L)
+                        .append("ratings.avg_rating", 1L)
+                        .append("type", 1L)
+        );
+        Document unwind = new Document("$unwind", new Document("path", "$Genre"));
+        Document match = new Document("$match", new Document("type", "album"));
+        Document group = new Document("$group", new Document("_id", "$Genre")
+                .append("count", new Document("$sum", 1L))
+                .append("avg_rate", new Document("$avg", "$ratings.avg_rating")));
+        Document sort = new Document("$sort",
+                new Document("avg_rate", -1L));
+        return Arrays.asList(project, unwind, match, group, sort);
+    }
 
-    private static ArrayList<Product> getMostPopularGenreByProductType(ProductType type){
+    private ArrayList<Product> getMostPopularGenreByProductType(ProductType type){
+        bdd = Bdd.getInstance();
+        MongoCollection products = bdd.getCollection("products");
+        List<Document> pipeline = buildAggregationPipeline();
+        List<Document> results = (List<Document>) products.aggregate(pipeline).into(new ArrayList<>());
         return null;
     }
 
@@ -62,3 +93,5 @@ public class Application {
         return null;
     }
 }
+
+

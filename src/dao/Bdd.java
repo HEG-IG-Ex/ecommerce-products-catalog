@@ -1,13 +1,22 @@
 package dao;
 
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.connection.ConnectionPoolSettings;
+import com.mongodb.connection.SocketSettings;
 import domaine.Product;
 import org.bson.Document;
+import org.bson.codecs.configuration.CodecRegistries;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
 
+import java.beans.BeanProperty;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class Bdd {
 
@@ -40,13 +49,38 @@ public class Bdd {
         this.setDatabase(DB_NAME);
     }
 
+    @BeanProperty
     private static void setClient(String URI){
+        ConnectionString connectionString = new ConnectionString(URI);
+
+        ConnectionPoolSettings connectionPoolSettings = ConnectionPoolSettings.builder()
+                .minSize(2)
+                .maxSize(20)
+                .maxConnectionIdleTime(60, TimeUnit.SECONDS)
+                .maxConnectionLifeTime(300, TimeUnit.SECONDS)
+                .build();
+
+        SocketSettings socketSettings = SocketSettings.builder()
+                .connectTimeout(5, TimeUnit.SECONDS)
+                .readTimeout(5, TimeUnit.SECONDS)
+                .build();
+
+        MongoClientSettings clientSettings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .applyToConnectionPoolSettings(builder -> builder.applySettings(connectionPoolSettings))
+                .applyToSocketSettings(builder -> builder.applySettings(socketSettings))
+                .build();
+
         client = MongoClients.create(URI);
     }
 
+    @BeanProperty
     private static void setDatabase(String dbName){
         if(clientIsReady()){
-            database = client.getDatabase(dbName);
+            CodecRegistry defaultCodecRegistry = MongoClientSettings.getDefaultCodecRegistry();
+            CodecRegistry fromProvider = CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build());
+            CodecRegistry pojoCodecRegistry = CodecRegistries.fromRegistries(defaultCodecRegistry, fromProvider);
+            database = client.getDatabase(dbName).withCodecRegistry(pojoCodecRegistry);
         }
     }
 
@@ -62,6 +96,8 @@ public class Bdd {
         }
         return null;
     }
+
+    public static void closeClient(){client.close();}
 
     private static boolean clientIsReady(){
         return client != null;
