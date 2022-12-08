@@ -42,15 +42,17 @@ public class DataLoader {
                         .append("discount",p.getDiscount())
                 )
                 .append("authors", Arrays.asList(book[2].split("/")))
-                .append("average_rating", parseDoubleStringWithComma(book[3]))
+                .append("release_date", parseStringForDate(book[10]))
+                .append("publisher", book[11])
                 .append("isbn", book[4])
                 .append("isbn13",book[5])
                 .append("language_code", book[6])
                 .append("num_pages", Integer.parseInt(book[7]))
-                .append("ratings_count", Integer.parseInt(book[8]))
-                .append("text_reviews_count", Integer.parseInt(book[9]))
-                .append("publication_date", parseStringForDate(book[10]))
-                .append("publisher", book[11]);
+                .append("ratings", new Document()
+                        .append("avg_rating", parseDoubleStringWithComma(book[3]))
+                        .append("nb_rating", Integer.parseInt(book[8]))
+                        .append("nb_review", Integer.parseInt(book[9]))
+                );
         return d;
     }
 
@@ -68,22 +70,24 @@ public class DataLoader {
                         .append("buying_price",p.getBuyingPrice())
                         .append("discount",p.getDiscount())
                 )
-                .append("posterLink", movie[0])
-                .append("seriesTitle", movie[1])
-                .append("releasedYear", Integer.parseInt(movie[2]))
+                .append("overview", movie[7])
+                .append("poster_linkg", movie[0])
+                .append("release_date", Integer.parseInt(movie[2]))
                 .append("certificate", movie[3])
                 .append("runtime", movie[4])
-                .append("genre", movie[5])
-                .append("imdbRating", parseDoubleStringWithComma(movie[6]))
-                .append("overview", movie[7])
-                .append("metascore", parseDoubleStringWithComma(movie[8]))
+                .append("genres", Arrays.asList(movie[5].split(", ")))
                 .append("direction", movie[9])
-                .append("cast", Arrays.asList(movie[10], movie[11], movie[12], movie[13]))
-                .append("noOfVotes", Integer.parseInt(movie[14]));
-
+                .append("cast", Arrays.asList(movie[10], movie[11], movie[12], movie[13]));
                 if(Integer.parseInt(movie[15]) > 0){
                     d.append("gross", Integer.parseInt(movie[15]));
                 }
+
+                d.append("ratings", new Document()
+                    .append("avg_rating", parseDoubleStringWithComma(movie[6]))
+                    .append("metascore", parseDoubleStringWithComma(movie[8]))
+                    .append("nb_rating", Integer.parseInt(movie[14]))
+                );
+
         return d;
     }
 
@@ -103,28 +107,20 @@ public class DataLoader {
                 .append("rolling_stone_ranking", Integer.parseInt(album[0]))
                 .append("artist", album[2])
                 .append("release_date", parseStringForDate(album[3]))
-                .append("genres", Arrays.asList(album[4].split(",")));
+                .append("genres", Arrays.asList(album[4].split(", ")));
 
                 if(album[5] != "none"){
                     d.append("descriptors", Arrays.asList(album[5].split(",")));
                 }
-                d.append("avg_ratings",parseDoubleStringWithComma(album[6]))
-                .append("number_of_rating", Integer.parseInt(album[7]))
-                .append("number_of_review", Integer.parseInt(album[8]));
+                d.append("ratings", new Document()
+                    .append("avg_rating",parseDoubleStringWithComma(album[6]))
+                    .append("nb_rating", Integer.parseInt(album[7]))
+                    .append("nb_review", Integer.parseInt(album[8]))
+                );
         return d;
     }
 
     private static Document buildVideoGameDocument(Pricing p, Shipping s, String[] videoGame) {
-
-        /*Rank
-        Name
-        Platform Year
-        Genre Publisher
-        NorthAmerica_Sales
-        EurpeanUnion_Sales
-        Japan_Sales
-        Other_Sales
-        Global_Sales*/
         Document d = new Document()
                 .append("type", "video_game")
                 .append("title", videoGame[1])
@@ -138,7 +134,7 @@ public class DataLoader {
                         .append("buying_price",p.getBuyingPrice())
                         .append("discount",p.getDiscount()))
                 .append("platform", videoGame[2])
-                .append("release_year", Integer.parseInt(videoGame[3]))
+                .append("release_date", Integer.parseInt(videoGame[3]))
                 .append("genre", videoGame[4])
                 .append("publisher", videoGame[5])
                 .append("sales", new Document()
@@ -150,8 +146,8 @@ public class DataLoader {
                 );
         return d;
     }
-    public static void loadMovies() {
 
+    public static void loadMovies() {
         bdd = Bdd.getInstance();
         MongoCollection products = bdd.getCollection("products");
 
@@ -164,7 +160,6 @@ public class DataLoader {
             );
             products.insertOne(d);
         }
-
     }
 
     public static void loadBooks() {

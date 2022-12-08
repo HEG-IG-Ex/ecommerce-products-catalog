@@ -1,8 +1,8 @@
 package domaine;
 
 public enum ProductType {
-    Movie,
-    Album,
-    Book,
-    VideoGame
+    Movie,      // => 0
+    Album,      // => 1
+    Book,       // => 2
+    VideoGame  // => 3
 }
