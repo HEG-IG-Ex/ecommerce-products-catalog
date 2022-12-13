@@ -1,11 +1,18 @@
 package metier;
 
+import com.mongodb.MongoCommandException;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Indexes;
 import dao.Bdd;
 import domaine.Product;
 import domaine.ProductType;
+import domaine.SearchType;
 import org.bson.BsonDocument;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +20,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.mongodb.client.model.Aggregates.unwind;
 import static dao.DataLoader.*;
 
 public class Application {
@@ -33,6 +41,8 @@ public class Application {
         loadBooks();
         loadVideoGames();
 
+        searchStringInProducts(SearchType.Title, "Lord of");
+
         bdd.closeClient();
 
         //SRC : https://www.freecodecamp.org/news/mongodb-aggregation-framework/
@@ -44,20 +54,21 @@ public class Application {
     }
 
     private List<Document> buildAggregationPipeline(){
-        Document project = new Document("$project",
+        /*Bson project = new Document("$project",
                 new Document("Genre", "$genres")
                         .append("title", 1L)
                         .append("ratings.avg_rating", 1L)
                         .append("type", 1L)
         );
-        Document unwind = new Document("$unwind", new Document("path", "$Genre"));
+        Bson unwind = unwind("$Genre");//new Document("$unwind", new Document("path", "$Genre"));
         Document match = new Document("$match", new Document("type", "album"));
         Document group = new Document("$group", new Document("_id", "$Genre")
                 .append("count", new Document("$sum", 1L))
                 .append("avg_rate", new Document("$avg", "$ratings.avg_rating")));
         Document sort = new Document("$sort",
                 new Document("avg_rate", -1L));
-        return Arrays.asList(project, unwind, match, group, sort);
+        return Arrays.asList(project, unwind, match, group, sort);*/
+        return null;
     }
 
     private ArrayList<Product> getMostPopularGenreByProductType(ProductType type){
@@ -69,17 +80,38 @@ public class Application {
     }
 
 
-    private static ArrayList<Product> searchStringInProducts(String typeSearch, String whatStringDoISearch){
-        // ArrayList<Product> myArrayListOfProduct = new ArrayList();
+    private ArrayList<Product> searchStringInProducts(SearchType typeSearch, String whatStringDoISearch){
+        ArrayList<Product> pojoProducts = new ArrayList();
+
+        bdd = Bdd.getInstance();
+        MongoCollection<Document> products = bdd.getCollection("products");
+
         // Lire la type search
             // - chercher dans les titres
             // - chercher dans les auteur/artist....
+        Bson idx = getIndexBySearchType(typeSearch);
+        Bson filter = Filters.text(whatStringDoISearch);
 
         // Drop l'index de texte
+        try{
+            products.dropIndex("textIdx");
+        }catch(MongoCommandException mce){
+            mce.printStackTrace();
+        }
 
         // Je recrée le bon index en fonction du typeSearch
+        products.createIndex(idx);
 
         // J'exécute ma requête {$text:{$search:'<whatStringDoISearch>'}}
+        FindIterable<Document> fi = products.find(filter);
+        MongoCursor<Document> cursor = fi.iterator();
+        try {
+            while(cursor.hasNext()) {
+                System.out.println(cursor.next().toJson());
+            }
+        } finally {
+            cursor.close();
+        }
 
         // Je désérialize les Bson doc en Product
             // For(Document d:collections){
@@ -91,6 +123,25 @@ public class Application {
 
 
         return null;
+    }
+
+    private static Bson getIndexBySearchType(SearchType searchType){
+        Bson idx = null;
+        if(searchType == SearchType.Title) {
+            idx = Indexes.compoundIndex(
+                Indexes.text("title"),
+                Indexes.text("overview")
+            );
+        }else{
+            idx = Indexes.compoundIndex(
+                Indexes.text("authors"),
+                Indexes.text("cast"),
+                Indexes.text("direction"),
+                Indexes.text("artist"),
+                Indexes.text("publisher")
+            );
+        }
+        return idx;
     }
 }
 
