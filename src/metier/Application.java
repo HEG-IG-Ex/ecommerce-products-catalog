@@ -33,13 +33,13 @@ public class Application {
         Logger.getLogger("org.mongodb.driver").setLevel(Level.SEVERE);
 
         bdd = Bdd.getInstance();
-        bdd.getCollection("products").drop();
+        /*bdd.getCollection("products").drop();
         bdd.createCollection("products");
 
         loadMovies();
         loadAlbums();
         loadBooks();
-        loadVideoGames();
+        loadVideoGames();*/
 
         searchStringInProducts(SearchType.Title, "Lord of");
 
@@ -81,10 +81,12 @@ public class Application {
 
 
     private ArrayList<Product> searchStringInProducts(SearchType typeSearch, String whatStringDoISearch){
-        ArrayList<Product> pojoProducts = new ArrayList();
 
         bdd = Bdd.getInstance();
-        MongoCollection<Document> products = bdd.getCollection("products");
+        MongoCollection<Product> mongoProducts = bdd.getDatabase().getCollection("products", Product.class);
+
+        //MongoCollection<Document> products = bdd.getCollection("products");
+
 
         // Lire la type search
             // - chercher dans les titres
@@ -94,16 +96,18 @@ public class Application {
 
         // Drop l'index de texte
         try{
-            products.dropIndex("textIdx");
+            mongoProducts.dropIndex("textIdx");
         }catch(MongoCommandException mce){
             mce.printStackTrace();
         }
 
         // Je recrée le bon index en fonction du typeSearch
-        products.createIndex(idx);
+        mongoProducts.createIndex(idx);
+
+        List<Product> products = mongoProducts.find(filter).into(new ArrayList<>());
 
         // J'exécute ma requête {$text:{$search:'<whatStringDoISearch>'}}
-        FindIterable<Document> fi = products.find(filter);
+/*        FindIterable<Document> fi = products.find(filter);
         MongoCursor<Document> cursor = fi.iterator();
         try {
             while(cursor.hasNext()) {
@@ -111,16 +115,7 @@ public class Application {
             }
         } finally {
             cursor.close();
-        }
-
-        // Je désérialize les Bson doc en Product
-            // For(Document d:collections){
-            //      if(d.get("type") = "movie"){
-            //          Movie m = new Movie(d.get("nom"), d.get("actors"))
-            //      }
-            //  myArrayListOfProduct.add m
-            //}
-
+        }*/
 
         return null;
     }

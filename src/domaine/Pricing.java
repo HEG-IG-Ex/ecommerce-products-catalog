@@ -1,11 +1,21 @@
 package domaine;
 
+import org.bson.codecs.pojo.annotations.BsonCreator;
+import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.bson.types.ObjectId;
+
 public class Pricing {
+    @BsonProperty("selling_price")
     private int sellingPrice;
+    @BsonProperty("buying_price")
     private int buyingPrice;
+    @BsonProperty("discount")
     private double discount;
 
-    public Pricing(int selling_price, int buying_price, double discount) {
+    @BsonCreator
+    public Pricing(@BsonProperty("selling_price") int selling_price,
+                   @BsonProperty("buying_price") int buying_price,
+                   @BsonProperty("discount") double discount) {
         this.sellingPrice = selling_price;
         this.buyingPrice = buying_price;
         this.discount = discount;

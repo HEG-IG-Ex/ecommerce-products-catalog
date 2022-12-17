@@ -1,12 +1,23 @@
 package domaine;
 
+import org.bson.codecs.pojo.annotations.BsonCreator;
+import org.bson.codecs.pojo.annotations.BsonProperty;
+
 public class Shipping {
+    @BsonProperty("weight")
     private double weight;
+    @BsonProperty("width")
     private int width;
+    @BsonProperty("heigth")
     private int heigth;
+    @BsonProperty("depth")
     private int depth;
 
-    public Shipping(double weight, int width, int heigth, int depth) {
+    @BsonCreator
+    public Shipping(@BsonProperty("weight") double weight,
+                    @BsonProperty("width") int width,
+                    @BsonProperty("heigth") int heigth,
+                    @BsonProperty("depth") int depth) {
         this.weight = weight;
         this.width = width;
         this.heigth = heigth;

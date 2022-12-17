@@ -29,7 +29,7 @@ public class DataLoader {
 
     private static Document buildBookDocument(Pricing p, Shipping s, String[] book) {
         Document d = new Document()
-                .append("type", "book")
+                .append("_cls", "Book")
                 .append("title", book[1])
                 .append("shipping", new Document()
                         .append("weight",s.getWeight())
@@ -48,7 +48,7 @@ public class DataLoader {
                 .append("isbn13",book[5])
                 .append("language_code", book[6])
                 .append("num_pages", Integer.parseInt(book[7]))
-                .append("ratings", new Document()
+                .append("rating", new Document()
                         .append("avg_rating", parseDoubleStringWithComma(book[3]))
                         .append("nb_rating", Integer.parseInt(book[8]))
                         .append("nb_review", Integer.parseInt(book[9]))
@@ -58,7 +58,7 @@ public class DataLoader {
 
     private static Document buildMovieDocument(Pricing p, Shipping s, String[] movie) {
         Document d = new Document()
-                .append("type", "movie")
+                .append("_cls", "Movie")
                 .append("title", movie[1])
                 .append("shipping", new Document()
                                 .append("weight",s.getWeight())
@@ -71,10 +71,10 @@ public class DataLoader {
                         .append("discount",p.getDiscount())
                 )
                 .append("overview", movie[7])
-                .append("poster_linkg", movie[0])
+                .append("poster_link", movie[0])
                 .append("release_date", Integer.parseInt(movie[2]))
                 .append("certificate", movie[3])
-                .append("runtime", movie[4])
+                .append("runtime", Integer.parseInt(movie[4]))
                 .append("genres", Arrays.asList(movie[5].split(", ")))
                 .append("direction", movie[9])
                 .append("cast", Arrays.asList(movie[10], movie[11], movie[12], movie[13]));
@@ -82,7 +82,7 @@ public class DataLoader {
                     d.append("gross", Integer.parseInt(movie[15]));
                 }
 
-                d.append("ratings", new Document()
+                d.append("rating", new Document()
                     .append("avg_rating", parseDoubleStringWithComma(movie[6]))
                     .append("metascore", parseDoubleStringWithComma(movie[8]))
                     .append("nb_rating", Integer.parseInt(movie[14]))
@@ -93,7 +93,7 @@ public class DataLoader {
 
     private static Document buildAlbumDocument(Pricing p, Shipping s, String[] album) {
         Document d = new Document()
-                .append("type", "album")
+                .append("_cls", "Album")
                 .append("title", album[1])
                 .append("shipping", new Document()
                         .append("weight",s.getWeight())
@@ -104,7 +104,6 @@ public class DataLoader {
                         .append("selling_price",p.getSellingPrice())
                         .append("buying_price",p.getBuyingPrice())
                         .append("discount",p.getDiscount()))
-                .append("rolling_stone_ranking", Integer.parseInt(album[0]))
                 .append("artist", album[2])
                 .append("release_date", parseStringForDate(album[3]))
                 .append("genres", Arrays.asList(album[4].split(", ")));
@@ -112,17 +111,18 @@ public class DataLoader {
                 if(album[5] != "none"){
                     d.append("descriptors", Arrays.asList(album[5].split(",")));
                 }
-                d.append("ratings", new Document()
+                d.append("rating", new Document()
                     .append("avg_rating",parseDoubleStringWithComma(album[6]))
                     .append("nb_rating", Integer.parseInt(album[7]))
                     .append("nb_review", Integer.parseInt(album[8]))
+                    .append("rolling_stone_ranking", Integer.parseInt(album[0]))
                 );
         return d;
     }
 
     private static Document buildVideoGameDocument(Pricing p, Shipping s, String[] videoGame) {
         Document d = new Document()
-                .append("type", "video_game")
+                .append("_cls", "VideoGame")
                 .append("title", videoGame[1])
                 .append("shipping", new Document()
                         .append("weight",s.getWeight())
@@ -135,7 +135,7 @@ public class DataLoader {
                         .append("discount",p.getDiscount()))
                 .append("platform", videoGame[2])
                 .append("release_date", Integer.parseInt(videoGame[3]))
-                .append("genre", videoGame[4])
+                .append("genres", Arrays.asList(videoGame[4]))
                 .append("publisher", videoGame[5])
                 .append("sales", new Document()
                         .append("noam", parseDoubleStringWithComma(videoGame[6]) * Math.pow(10.0, 6.0))

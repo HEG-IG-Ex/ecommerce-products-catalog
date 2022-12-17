@@ -54,33 +54,35 @@ public class Bdd {
         ConnectionString connectionString = new ConnectionString(URI);
 
         ConnectionPoolSettings connectionPoolSettings = ConnectionPoolSettings.builder()
-                .minSize(2)
-                .maxSize(20)
-                .maxConnectionIdleTime(60, TimeUnit.SECONDS)
-                .maxConnectionLifeTime(300, TimeUnit.SECONDS)
-                .build();
+                                                                              .minSize(2)
+                                                                              .maxSize(20)
+                                                                              .maxConnectionIdleTime(60, TimeUnit.SECONDS)
+                                                                              .maxConnectionLifeTime(300, TimeUnit.SECONDS)
+                                                                              .build();
 
         SocketSettings socketSettings = SocketSettings.builder()
-                .connectTimeout(5, TimeUnit.SECONDS)
-                .readTimeout(5, TimeUnit.SECONDS)
-                .build();
+                                                      .connectTimeout(5, TimeUnit.SECONDS)
+                                                      .readTimeout(5, TimeUnit.SECONDS)
+                                                      .build();
+
+        CodecRegistry defaultCodecRegistry = MongoClientSettings.getDefaultCodecRegistry();
+        CodecRegistry fromProvider = CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build());
+        CodecRegistry pojoCodecRegistry = CodecRegistries.fromRegistries(defaultCodecRegistry, fromProvider);
 
         MongoClientSettings clientSettings = MongoClientSettings.builder()
-                .applyConnectionString(connectionString)
-                .applyToConnectionPoolSettings(builder -> builder.applySettings(connectionPoolSettings))
-                .applyToSocketSettings(builder -> builder.applySettings(socketSettings))
-                .build();
+                                                                .applyConnectionString(connectionString)
+                                                                .applyToConnectionPoolSettings(builder -> builder.applySettings(connectionPoolSettings))
+                                                                .applyToSocketSettings(builder -> builder.applySettings(socketSettings))
+                                                                .codecRegistry(pojoCodecRegistry)
+                                                                .build();
 
-        client = MongoClients.create(URI);
+        client = MongoClients.create(clientSettings);
     }
 
     @BeanProperty
     private static void setDatabase(String dbName){
         if(clientIsReady()){
-            CodecRegistry defaultCodecRegistry = MongoClientSettings.getDefaultCodecRegistry();
-            CodecRegistry fromProvider = CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build());
-            CodecRegistry pojoCodecRegistry = CodecRegistries.fromRegistries(defaultCodecRegistry, fromProvider);
-            database = client.getDatabase(dbName).withCodecRegistry(pojoCodecRegistry);
+            database = client.getDatabase(dbName);
         }
     }
 
@@ -95,6 +97,10 @@ public class Bdd {
             return database.getCollection(collectionName);
         }
         return null;
+    }
+
+    public static MongoDatabase getDatabase(){
+        return database;
     }
 
     public static void closeClient(){client.close();}
