@@ -7,11 +7,15 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import dao.Bdd;
+import domaine.Pricing;
 import domaine.Product;
 import domaine.ProductType;
 import domaine.SearchType;
 import org.bson.BsonDocument;
 import org.bson.Document;
+import org.bson.codecs.DecoderContext;
+import org.bson.codecs.pojo.ClassModel;
+import org.bson.codecs.pojo.Conventions;
 import org.bson.conversions.Bson;
 
 import java.util.ArrayList;
@@ -33,13 +37,13 @@ public class Application {
         Logger.getLogger("org.mongodb.driver").setLevel(Level.SEVERE);
 
         bdd = Bdd.getInstance();
-        /*bdd.getCollection("products").drop();
-        bdd.createCollection("products");
+        bdd.getCollection("products").deleteMany(new Document());
+        //bdd.createCollection("products");
 
         loadMovies();
         loadAlbums();
         loadBooks();
-        loadVideoGames();*/
+        loadVideoGames();
 
         searchStringInProducts(SearchType.Title, "Lord of");
 
@@ -50,6 +54,8 @@ public class Application {
         //SRC : https://stackoverflow.com/questions/39320825/pojo-to-org-bson-document-and-vice-versa
         //SRC : https://mongodb.github.io/mongo-java-driver/3.9/driver/getting-started/quick-start-pojo/
         //SRC : https://www.mongodb.com/developer/languages/java/java-aggregation-pipeline/
+        //SRC : https://zx77.medium.com/mongodb-java-driver-for-polymorphism-8d8a9e28ec24
+
 
     }
 
@@ -104,7 +110,16 @@ public class Application {
         // Je recrée le bon index en fonction du typeSearch
         mongoProducts.createIndex(idx);
 
-        List<Product> products = mongoProducts.find(filter).into(new ArrayList<>());
+        //List<Product> products = mongoProducts.find(filter).into(new ArrayList<Product>());
+        ClassModel<Product> classModel = ClassModel.builder(Product.class).
+                conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION)).build();
+
+        FindIterable<Product> iterable = mongoProducts.find(filter);
+
+        for (Product doc : iterable) {
+            // process the nested document
+            //Pricing p = doc.getPricing();
+        }
 
         // J'exécute ma requête {$text:{$search:'<whatStringDoISearch>'}}
 /*        FindIterable<Document> fi = products.find(filter);

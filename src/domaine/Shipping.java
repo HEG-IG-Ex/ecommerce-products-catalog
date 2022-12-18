@@ -13,6 +13,8 @@ public class Shipping {
     @BsonProperty("depth")
     private int depth;
 
+    public Shipping(){}
+
     @BsonCreator
     public Shipping(@BsonProperty("weight") double weight,
                     @BsonProperty("width") int width,

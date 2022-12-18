@@ -1,26 +1,51 @@
 package domaine;
 
+import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
 
 import java.util.List;
 
 @BsonDiscriminator(value="Movie", key="_cls")
 public class Movie extends Product{
+    @BsonProperty("overview")
     private String overview;
+    @BsonProperty("poster_link")
     private String posterLink;
+    @BsonProperty("release_date")
     private int releaseDate;
+    @BsonProperty("certificate")
     private String certificate;
+    @BsonProperty("runtime")
     private int runtime;
+    @BsonProperty("genres")
     private List<String> genres;
+    @BsonProperty("direction")
     private String direction;
+    @BsonProperty("cast")
     private List<String>cast;
+    @BsonProperty("gross")
     private Long gross;
 
-    public Movie(ObjectId id, String title, Shipping shipping, Pricing pricing, Pricing rating,
-                 String overview, String posterLink, int releaseDate, String certificate,
-                 int runtime, List<String> genres, String direction, List<String> cast, Long gross) {
-        super(id, title, shipping, pricing, rating);
+    public Movie(){
+    }
+
+    @BsonCreator
+    public Movie(@BsonProperty("_id")  ObjectId id,
+                 @BsonProperty("title") String title,
+                 @BsonProperty("shipping") Shipping shipping,
+                 @BsonProperty("pricing") Pricing pricing,
+                 @BsonProperty("overview") String overview,
+                 @BsonProperty("poster_link") String posterLink,
+                 @BsonProperty("release_date") int releaseDate,
+                 @BsonProperty("certificate") String certificate,
+                 @BsonProperty("runtime") int runtime,
+                 @BsonProperty("genre") List<String> genres,
+                 @BsonProperty("direction")  String direction,
+                 @BsonProperty("cast") List<String> cast,
+                 @BsonProperty("gross") Long gross) {
+        super(id, title);
         this.overview = overview;
         this.posterLink = posterLink;
         this.releaseDate = releaseDate;

@@ -12,10 +12,13 @@ import domaine.Product;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.ClassModel;
+import org.bson.codecs.pojo.Conventions;
 import org.bson.codecs.pojo.PojoCodecProvider;
 
 import java.beans.BeanProperty;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 public class Bdd {
@@ -75,6 +78,8 @@ public class Bdd {
                                                                 .applyToSocketSettings(builder -> builder.applySettings(socketSettings))
                                                                 .codecRegistry(pojoCodecRegistry)
                                                                 .build();
+
+
 
         client = MongoClients.create(clientSettings);
     }

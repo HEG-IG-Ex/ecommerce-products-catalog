@@ -1,24 +1,35 @@
 package domaine;
 
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
 import java.util.Date;
 import java.util.List;
 
 @BsonDiscriminator(value="Book", key="_cls")
 public class Book extends Product{
+    @BsonProperty("authors")
     private List<String> authors;
+    @BsonProperty("release_date")
     private Date releaseDate;
+    @BsonProperty("publisher")
     private String publisher;
+    @BsonProperty("isbn")
     private String isbn;
+    @BsonProperty("isbn13")
     private String isbn13;
+    @BsonProperty("language_code")
     private String languageCode;
+    @BsonProperty("num_pages")
     private int numPages;
 
-    public Book(ObjectId id, String title, Shipping shipping, Pricing pricing, Pricing rating,
+    public Book(){
+    }
+
+    public Book(ObjectId id, String title, Shipping shipping, Pricing pricing,
                 List<String> authors, Date releaseDate, String publisher, String isbn,
                 String isbn13, String languageCode, int numPages) {
-        super(id, title, shipping, pricing, rating);
+        super(id, title);
         this.authors = authors;
         this.releaseDate = releaseDate;
         this.publisher = publisher;
