@@ -1,5 +1,6 @@
 package domaine;
 
+import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
@@ -23,12 +24,17 @@ public class Book extends Product{
     @BsonProperty("num_pages")
     private int numPages;
 
-    public Book(){
-    }
 
-    public Book(ObjectId id, String title, Shipping shipping, Pricing pricing,
-                List<String> authors, Date releaseDate, String publisher, String isbn,
-                String isbn13, String languageCode, int numPages) {
+    @BsonCreator
+    public Book(@BsonProperty("_id") ObjectId id,
+                @BsonProperty("title")String title,
+                @BsonProperty("authors") List<String> authors,
+                @BsonProperty("release_date") Date releaseDate,
+                @BsonProperty("publisher") String publisher,
+                @BsonProperty("isbn") String isbn,
+                @BsonProperty("isbn13") String isbn13,
+                @BsonProperty("language_code") String languageCode,
+                @BsonProperty("num_pages") int numPages) {
         super(id, title);
         this.authors = authors;
         this.releaseDate = releaseDate;

@@ -9,14 +9,30 @@ import java.util.List;
 
 @BsonDiscriminator(value="VideoGame", key="_cls")
 public class VideoGame extends Product {
+    @BsonProperty("platform")
     private String platform;
+    @BsonProperty("release_date")
     private int releaseDate;
+    @BsonProperty("genres")
     private List<String> genres;
+    @BsonProperty("publisher")
     private String publisher;
     private Sale sale;
 
-    public VideoGame(){
-
+    @BsonCreator
+    public VideoGame(@BsonProperty("_id") ObjectId id,
+                     @BsonProperty("title") String title,
+                     @BsonProperty("platform") String platform,
+                     @BsonProperty("release_date") int releaseDate,
+                     @BsonProperty("genre") List<String> genres,
+                     @BsonProperty("publisher") String publisher,
+                     @BsonProperty("sale") Sale sale) {
+        super(id, title);
+        this.platform = platform;
+        this.releaseDate = releaseDate;
+        this.genres = genres;
+        this.publisher = publisher;
+        this.sale = sale;
     }
 
     public String getPlatform() {
@@ -59,26 +75,6 @@ public class VideoGame extends Product {
         this.sale = sale;
     }
 
-    @BsonCreator
-    public VideoGame(@BsonProperty("_id") ObjectId id,
-                     @BsonProperty("title") String title,
-                     @BsonProperty("shipping") Shipping shipping,
-                     @BsonProperty("pricing") Pricing pricing,
-                     @BsonProperty("platform") String platform,
-                     @BsonProperty("release_date") int releaseDate,
-                     @BsonProperty("genre") List<String> genres,
-                     @BsonProperty("publisher") String publisher,
-                     @BsonProperty("sale") Sale sale) {
-        super(id, title);
-        this.platform = platform;
-        this.releaseDate = releaseDate;
-        this.genres = genres;
-        this.publisher = publisher;
-        this.sale = sale;
-
-
-    }
-
-
 
 }
+

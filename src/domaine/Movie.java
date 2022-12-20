@@ -28,14 +28,9 @@ public class Movie extends Product{
     @BsonProperty("gross")
     private Long gross;
 
-    public Movie(){
-    }
-
     @BsonCreator
     public Movie(@BsonProperty("_id")  ObjectId id,
                  @BsonProperty("title") String title,
-                 @BsonProperty("shipping") Shipping shipping,
-                 @BsonProperty("pricing") Pricing pricing,
                  @BsonProperty("overview") String overview,
                  @BsonProperty("poster_link") String posterLink,
                  @BsonProperty("release_date") int releaseDate,

@@ -1,5 +1,6 @@
 package domaine;
 
+import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
@@ -18,12 +19,15 @@ public class Album extends Product{
     @BsonProperty("descriptors")
     private List<String> descriptors;
 
-    public Album(){
-    }
 
-    public Album(ObjectId id, String title, Shipping shipping, Pricing pricing,
-                 String artist, Date releaseDate,
-                 List<String> genres, List<String> descriptors) {
+
+    @BsonCreator
+    public Album(@BsonProperty("_id") ObjectId id,
+                 @BsonProperty("title")String title,
+                 @BsonProperty("artist") String artist,
+                 @BsonProperty("realease_date") Date releaseDate,
+                 @BsonProperty("genres") List<String> genres,
+                 @BsonProperty("descriptors")List<String> descriptors) {
         super(id, title);
         this.artist = artist;
         this.releaseDate = releaseDate;

@@ -111,10 +111,8 @@ public class Application {
         mongoProducts.createIndex(idx);
 
         //List<Product> products = mongoProducts.find(filter).into(new ArrayList<Product>());
-        ClassModel<Product> classModel = ClassModel.builder(Product.class).
-                conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION)).build();
 
-        FindIterable<Product> iterable = mongoProducts.find(filter);
+        FindIterable<Product> iterable = mongoProducts.find(filter);//
 
         for (Product doc : iterable) {
             // process the nested document

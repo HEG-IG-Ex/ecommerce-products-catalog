@@ -7,18 +7,17 @@ import org.bson.codecs.pojo.annotations.BsonProperty;
 
 import org.bson.types.ObjectId;
 
-@BsonDiscriminator
-public abstract class Product {
 
+public abstract class Product {
     @BsonId()
     @BsonProperty("_id")
     private ObjectId id;
     @BsonProperty("title")
     private String title;
-    private Shipping shipping = null;
-    private Pricing pricing = null;
 
-    public Product() {}
+    private Shipping shipping;
+
+    private Pricing pricing;
 
     @BsonCreator
     public Product(@BsonProperty("_id") ObjectId id,
