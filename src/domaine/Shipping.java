@@ -1,10 +1,8 @@
 package domaine;
 
 import org.bson.codecs.pojo.annotations.BsonCreator;
-import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
-@BsonDiscriminator(value="Shipping", key="_cls")
 public class Shipping {
     @BsonProperty("weight")
     private double weight;

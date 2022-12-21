@@ -1,30 +1,22 @@
 package metier;
 
-import com.mongodb.MongoCommandException;
-import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.*;
 import dao.Bdd;
-import domaine.Pricing;
+import domaine.MostPopularGenre;
 import domaine.Product;
 import domaine.ProductType;
 import domaine.SearchType;
-import org.bson.BsonDocument;
 import org.bson.Document;
-import org.bson.codecs.DecoderContext;
-import org.bson.codecs.pojo.ClassModel;
-import org.bson.codecs.pojo.Conventions;
 import org.bson.conversions.Bson;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.mongodb.client.model.Aggregates.unwind;
+
+import static com.mongodb.client.model.Sorts.descending;
 import static dao.DataLoader.*;
 
 public class Application {
@@ -37,15 +29,16 @@ public class Application {
         Logger.getLogger("org.mongodb.driver").setLevel(Level.SEVERE);
 
         bdd = Bdd.getInstance();
-        bdd.getCollection("products").deleteMany(new Document());
-        //bdd.createCollection("products");
+        /*bdd.getCollection("products").deleteMany(new Document());
+
 
         loadMovies();
         loadAlbums();
         loadBooks();
         loadVideoGames();
 
-        searchStringInProducts(SearchType.Title, "Lord of");
+        searchStringInProducts(SearchType.Persons, "Lord of");*/
+        getMostPopularGenreByProductType(ProductType.Movie);
 
         bdd.closeClient();
 
@@ -59,88 +52,82 @@ public class Application {
 
     }
 
-    private List<Document> buildAggregationPipeline(){
-        /*Bson project = new Document("$project",
-                new Document("Genre", "$genres")
-                        .append("title", 1L)
-                        .append("ratings.avg_rating", 1L)
-                        .append("type", 1L)
-        );
-        Bson unwind = unwind("$Genre");//new Document("$unwind", new Document("path", "$Genre"));
-        Document match = new Document("$match", new Document("type", "album"));
-        Document group = new Document("$group", new Document("_id", "$Genre")
-                .append("count", new Document("$sum", 1L))
-                .append("avg_rate", new Document("$avg", "$ratings.avg_rating")));
-        Document sort = new Document("$sort",
-                new Document("avg_rate", -1L));
-        return Arrays.asList(project, unwind, match, group, sort);*/
-        return null;
-    }
-
-    private ArrayList<Product> getMostPopularGenreByProductType(ProductType type){
+    private void getMostPopularGenreByProductType(ProductType type){
         bdd = Bdd.getInstance();
-        MongoCollection products = bdd.getCollection("products");
-        List<Document> pipeline = buildAggregationPipeline();
-        List<Document> results = (List<Document>) products.aggregate(pipeline).into(new ArrayList<>());
-        return null;
-    }
 
+
+
+        Bson match = Aggregates.match(Filters.eq("_cls", "domaine.Movie"));
+        Bson project = Aggregates.project(
+                Projections.fields(
+                        Projections.excludeId(),
+                        Projections.include("genres", "_cls","title", "rating.avg_rating", "type")
+                )
+        );
+        Bson unwind = Aggregates.unwind("$genres");
+        Bson group =  Aggregates.group("$genres",
+                Accumulators.sum("count", 1L),
+                Accumulators.avg("avg_rating", "$rating.avg_rating"),
+                Accumulators.push("titles", "$title")
+        );
+        Bson sort = Aggregates.sort(descending("avg_rating"));
+
+        MongoCollection<Document> products = bdd.getCollection("products");
+        List<MostPopularGenre> mostPopularGenreByProductType = products.aggregate(Arrays.asList(match,project,unwind,group,sort), MostPopularGenre.class).into(new ArrayList<>());
+    }
 
     private ArrayList<Product> searchStringInProducts(SearchType typeSearch, String whatStringDoISearch){
 
         bdd = Bdd.getInstance();
         MongoCollection<Product> mongoProducts = bdd.getDatabase().getCollection("products", Product.class);
-
-        //MongoCollection<Document> products = bdd.getCollection("products");
-
-
-        // Lire la type search
-            // - chercher dans les titres
-            // - chercher dans les auteur/artist....
-        Bson idx = getIndexBySearchType(typeSearch);
         Bson filter = Filters.text(whatStringDoISearch);
 
+        if(manageTextIndex(mongoProducts, typeSearch)){
+            return mongoProducts.find(filter).into(new ArrayList<>());
+        }
+        return null;
+
+    }
+
+    private boolean manageTextIndex(MongoCollection<Product> collection, SearchType typeSearch){
+        // Lire la type search
+        // - chercher dans les titres
+        // - chercher dans les auteur/artist...
+        Bson idx = getIndexBySearchType(typeSearch);
+
         // Drop l'index de texte
-        try{
-            mongoProducts.dropIndex("textIdx");
-        }catch(MongoCommandException mce){
-            mce.printStackTrace();
+        String indexTextName = getTextIndexName(collection);
+        if(indexTextName != null){
+            collection.dropIndex(indexTextName);
         }
 
         // Je recrée le bon index en fonction du typeSearch
-        mongoProducts.createIndex(idx);
-
-        //List<Product> products = mongoProducts.find(filter).into(new ArrayList<Product>());
-
-        FindIterable<Product> iterable = mongoProducts.find(filter);//
-
-        for (Product doc : iterable) {
-            // process the nested document
-            //Pricing p = doc.getPricing();
+        String newTextIdxName = collection.createIndex(idx);
+        if(!newTextIdxName.isEmpty()){
+            return true;
+        }else{
+            return false;
         }
+    }
 
-        // J'exécute ma requête {$text:{$search:'<whatStringDoISearch>'}}
-/*        FindIterable<Document> fi = products.find(filter);
-        MongoCursor<Document> cursor = fi.iterator();
-        try {
-            while(cursor.hasNext()) {
-                System.out.println(cursor.next().toJson());
+    private String getTextIndexName(MongoCollection<Product> collection) {
+        for (Document index : collection.listIndexes()) {
+            Document d = (Document) index.get("key");
+            if(d.containsKey("_fts")){
+                return index.getString("name");
             }
-        } finally {
-            cursor.close();
-        }*/
-
+        }
         return null;
     }
 
     private static Bson getIndexBySearchType(SearchType searchType){
-        Bson idx = null;
+        Bson idx;
         if(searchType == SearchType.Title) {
             idx = Indexes.compoundIndex(
                 Indexes.text("title"),
                 Indexes.text("overview")
             );
-        }else{
+        }else if(searchType == SearchType.Persons) {
             idx = Indexes.compoundIndex(
                 Indexes.text("authors"),
                 Indexes.text("cast"),
@@ -148,7 +135,18 @@ public class Application {
                 Indexes.text("artist"),
                 Indexes.text("publisher")
             );
+        }else{
+            idx = Indexes.compoundIndex(
+                    Indexes.text("title"),
+                    Indexes.text("overview"),
+                    Indexes.text("authors"),
+                    Indexes.text("cast"),
+                    Indexes.text("direction"),
+                    Indexes.text("artist"),
+                    Indexes.text("publisher")
+            );
         }
+
         return idx;
     }
 }

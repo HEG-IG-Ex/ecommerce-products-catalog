@@ -7,8 +7,9 @@ import org.bson.types.ObjectId;
 import java.util.Date;
 import java.util.List;
 
-@BsonDiscriminator(value="Book", key="_cls")
+@BsonDiscriminator(value="domaine.Book", key="_cls")
 public class Book extends Product{
+
     @BsonProperty("authors")
     private List<String> authors;
     @BsonProperty("release_date")
@@ -24,10 +25,11 @@ public class Book extends Product{
     @BsonProperty("num_pages")
     private int numPages;
 
-
     @BsonCreator
     public Book(@BsonProperty("_id") ObjectId id,
-                @BsonProperty("title")String title,
+                @BsonProperty("title") String title,
+                @BsonProperty("shipping") Shipping shipping,
+                @BsonProperty("pricing") Pricing pricing,
                 @BsonProperty("authors") List<String> authors,
                 @BsonProperty("release_date") Date releaseDate,
                 @BsonProperty("publisher") String publisher,
@@ -35,7 +37,7 @@ public class Book extends Product{
                 @BsonProperty("isbn13") String isbn13,
                 @BsonProperty("language_code") String languageCode,
                 @BsonProperty("num_pages") int numPages) {
-        super(id, title);
+        super(id, title, shipping, pricing);
         this.authors = authors;
         this.releaseDate = releaseDate;
         this.publisher = publisher;
@@ -85,13 +87,9 @@ public class Book extends Product{
         this.isbn13 = isbn13;
     }
 
-    public String getLanguageCode() {
-        return languageCode;
-    }
+    public String getLanguageCode() {return languageCode;}
 
-    public void setLanguageCode(String languageCode) {
-        this.languageCode = languageCode;
-    }
+    public void setLanguageCode(String languageCode) {this.languageCode = languageCode;}
 
     public int getNumPages() {
         return numPages;

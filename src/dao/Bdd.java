@@ -52,7 +52,6 @@ public class Bdd {
         this.setDatabase(DB_NAME);
     }
 
-    @BeanProperty
     private static void setClient(String URI){
         ConnectionString connectionString = new ConnectionString(URI);
 
@@ -69,8 +68,17 @@ public class Bdd {
                                                       .build();
 
 
-        CodecRegistry fromProvider = CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build());
+        //ClassModel<Product> productModel = ClassModel.builder(Product.class).conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION)).build();
+        //ClassModel<Movie> movieModel = ClassModel.builder(Movie.class).conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION)).build();
+        //PojoCodecProvider customPojoCodecProvider = PojoCodecProvider.builder().register(productModel, movieModel).build();
+        //PojoCodecProvider defaultPojoCodecProvider = PojoCodecProvider.builder().automatic(false).register(Product.class, Movie.class, Book.class, Album.class, Shipping.class, Pricing.class).conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION)).build();
+
+        PojoCodecProvider defaultPojoCodecProvider = PojoCodecProvider.builder().automatic(true).conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION)).build();
+
+
+        CodecRegistry fromProvider = CodecRegistries.fromProviders(defaultPojoCodecProvider);
         CodecRegistry defaultCodecRegistry = MongoClientSettings.getDefaultCodecRegistry();
+
         CodecRegistry pojoCodecRegistry = CodecRegistries.fromRegistries(defaultCodecRegistry, fromProvider);
 
 /*
@@ -102,7 +110,6 @@ public class Bdd {
         client = MongoClients.create(clientSettings);
     }
 
-    @BeanProperty
     private static void setDatabase(String dbName){
         if(clientIsReady()){
             database = client.getDatabase(dbName);

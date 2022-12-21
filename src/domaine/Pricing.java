@@ -4,7 +4,6 @@ import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
-@BsonDiscriminator(value="Pricing", key="_cls")
 public class Pricing {
     @BsonProperty("selling_price")
     private int sellingPrice;

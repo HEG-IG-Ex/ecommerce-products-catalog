@@ -7,7 +7,7 @@ import org.bson.types.ObjectId;
 
 import java.util.List;
 
-@BsonDiscriminator(value="Movie", key="_cls")
+@BsonDiscriminator(value="domaine.Movie", key="_cls")
 public class Movie extends Product{
     @BsonProperty("overview")
     private String overview;
@@ -29,18 +29,20 @@ public class Movie extends Product{
     private Long gross;
 
     @BsonCreator
-    public Movie(@BsonProperty("_id")  ObjectId id,
+    public Movie(@BsonProperty("_id") ObjectId id,
                  @BsonProperty("title") String title,
+                 @BsonProperty("shipping") Shipping shipping,
+                 @BsonProperty("pricing") Pricing pricing,
                  @BsonProperty("overview") String overview,
                  @BsonProperty("poster_link") String posterLink,
                  @BsonProperty("release_date") int releaseDate,
                  @BsonProperty("certificate") String certificate,
                  @BsonProperty("runtime") int runtime,
-                 @BsonProperty("genre") List<String> genres,
-                 @BsonProperty("direction")  String direction,
+                 @BsonProperty("genres") List<String> genres,
+                 @BsonProperty("direction") String direction,
                  @BsonProperty("cast") List<String> cast,
                  @BsonProperty("gross") Long gross) {
-        super(id, title);
+        super(id, title, shipping, pricing);
         this.overview = overview;
         this.posterLink = posterLink;
         this.releaseDate = releaseDate;

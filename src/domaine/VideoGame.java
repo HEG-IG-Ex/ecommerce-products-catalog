@@ -7,7 +7,7 @@ import org.bson.types.ObjectId;
 
 import java.util.List;
 
-@BsonDiscriminator(value="VideoGame", key="_cls")
+@BsonDiscriminator(value="domaine.VideoGame", key="_cls")
 public class VideoGame extends Product {
     @BsonProperty("platform")
     private String platform;
@@ -17,17 +17,20 @@ public class VideoGame extends Product {
     private List<String> genres;
     @BsonProperty("publisher")
     private String publisher;
+    @BsonProperty("sale")
     private Sale sale;
 
     @BsonCreator
     public VideoGame(@BsonProperty("_id") ObjectId id,
                      @BsonProperty("title") String title,
+                     @BsonProperty("shipping") Shipping shipping,
+                     @BsonProperty("pricing") Pricing pricing,
                      @BsonProperty("platform") String platform,
                      @BsonProperty("release_date") int releaseDate,
-                     @BsonProperty("genre") List<String> genres,
+                     @BsonProperty("genres") List<String> genres,
                      @BsonProperty("publisher") String publisher,
                      @BsonProperty("sale") Sale sale) {
-        super(id, title);
+        super(id, title, shipping, pricing);
         this.platform = platform;
         this.releaseDate = releaseDate;
         this.genres = genres;

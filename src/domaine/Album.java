@@ -8,8 +8,9 @@ import org.bson.types.ObjectId;
 import java.util.Date;
 import java.util.List;
 
-@BsonDiscriminator(value="Album", key="_cls")
+@BsonDiscriminator(value="domaine.Album", key="_cls")
 public class Album extends Product{
+
     @BsonProperty("artist")
     private String artist;
     @BsonProperty("release_date")
@@ -19,16 +20,16 @@ public class Album extends Product{
     @BsonProperty("descriptors")
     private List<String> descriptors;
 
-
-
     @BsonCreator
     public Album(@BsonProperty("_id") ObjectId id,
-                 @BsonProperty("title")String title,
+                 @BsonProperty("title") String title,
+                 @BsonProperty("shipping") Shipping shipping,
+                 @BsonProperty("pricing") Pricing pricing,
                  @BsonProperty("artist") String artist,
-                 @BsonProperty("realease_date") Date releaseDate,
+                 @BsonProperty("release_date") Date releaseDate,
                  @BsonProperty("genres") List<String> genres,
-                 @BsonProperty("descriptors")List<String> descriptors) {
-        super(id, title);
+                 @BsonProperty("descriptors") List<String> descriptors) {
+        super(id, title, shipping, pricing);
         this.artist = artist;
         this.releaseDate = releaseDate;
         this.genres = genres;

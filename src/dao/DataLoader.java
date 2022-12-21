@@ -1,6 +1,7 @@
 package dao;
 
 import com.mongodb.client.MongoCollection;
+import domaine.Book;
 import domaine.Pricing;
 import domaine.ProductType;
 import domaine.Shipping;
@@ -29,7 +30,7 @@ public class DataLoader {
 
     private static Document buildBookDocument(Pricing p, Shipping s, String[] book) {
         Document d = new Document()
-                .append("_cls", "Book")
+                .append("_cls", "domaine.Book")
                 .append("title", book[1])
                 .append("shipping", new Document()
                         .append("_cls", "Shipping")
@@ -60,15 +61,15 @@ public class DataLoader {
 
     private static Document buildMovieDocument(Pricing p, Shipping s, String[] movie) {
         Document d = new Document()
-                .append("_cls", "Movie")
+                .append("_cls", "domaine.Movie")
                 .append("title", movie[1])
-                .append("Shipping", new Document()
+                .append("shipping", new Document()
                                 .append("_cls", "Shipping")
                                 .append("weight",s.getWeight())
                                 .append("width",s.getWidth())
                                 .append("heigth",s.getHeigth())
                                 .append("depth",s.getDepth()))
-                .append("Pricing", new Document()
+                .append("pricing", new Document()
                         .append("_cls", "Pricing")
                         .append("selling_price",p.getSellingPrice())
                         .append("buying_price",p.getBuyingPrice())
@@ -97,7 +98,7 @@ public class DataLoader {
 
     private static Document buildAlbumDocument(Pricing p, Shipping s, String[] album) {
         Document d = new Document()
-                .append("_cls", "Album")
+                .append("_cls", "domaine.Album")
                 .append("title", album[1])
                 .append("shipping", new Document()
                         .append("_cls", "Shipping")
@@ -129,7 +130,7 @@ public class DataLoader {
 
     private static Document buildVideoGameDocument(Pricing p, Shipping s, String[] videoGame) {
         Document d = new Document()
-                .append("_cls", "VideoGame")
+                .append("_cls", "domaine.VideoGame")
                 .append("title", videoGame[1])
                 .append("shipping", new Document()
                         .append("_cls", "Shipping")
