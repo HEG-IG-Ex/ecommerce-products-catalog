@@ -1,4 +1,4 @@
-package domaine;
+package aggregation;
 
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonId;
@@ -59,7 +59,32 @@ public class MostPopularGenre {
         return titles;
     }
 
+    public String getFewTitlesToDispaly(){
+        String fewTitles = "";
+        int currentSize = this.getTitles().size();
+        if(currentSize > 0){
+            int numberOfTitleToDisplay = currentSize > 5 ? 5 : currentSize;
+            for (int i = 0; i < numberOfTitleToDisplay; i++) {
+                fewTitles += "      - " + this.getTitles().get(i) + "\n";
+            }
+            return fewTitles + "        ...\n";
+        }
+        return "No Titles\n";
+
+    }
+
+
     public void setTitles(List<String> titles) {
         this.titles = titles;
+    }
+
+
+    @Override
+    public String toString() {
+        return  "Genre : " +this.getGenre().toUpperCase() + '\n' +
+                " - Average Rating : " + this.getAverageRating() + '\n' +
+                " - Count of Products . " + totalProduct + '\n' +
+                "   Associated titles :\n" +
+                this.getFewTitlesToDispaly();
     }
 }

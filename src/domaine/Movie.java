@@ -25,8 +25,8 @@ public class Movie extends Product{
     private String direction;
     @BsonProperty("cast")
     private List<String>cast;
-    @BsonProperty("gross")
-    private Long gross;
+    @BsonProperty("worlwide_sales")
+    private Long worldwideSales;
 
     @BsonCreator
     public Movie(@BsonProperty("_id") ObjectId id,
@@ -51,7 +51,7 @@ public class Movie extends Product{
         this.genres = genres;
         this.direction = direction;
         this.cast = cast;
-        this.gross = gross;
+        this.worldwideSales = gross;
     }
 
     public String getOverview() {
@@ -119,10 +119,19 @@ public class Movie extends Product{
     }
 
     public Long getGross() {
-        return gross;
+        return worldwideSales;
     }
 
     public void setGross(Long gross) {
-        this.gross = gross;
+        this.worldwideSales = gross;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() +
+                "type: Album\n" +
+                "direction: " + this.getDirection() + "\n" +
+                "releaseDate: " + this.getReleaseDate() + "\n" +
+                "cast: " + this.getCast();
     }
 }

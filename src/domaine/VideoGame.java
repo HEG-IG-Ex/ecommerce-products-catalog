@@ -78,6 +78,13 @@ public class VideoGame extends Product {
         this.sale = sale;
     }
 
-
+    @Override
+    public String toString() {
+        return super.toString() +
+                "type: Video Game\n" +
+                "publisher: " + this.getPublisher() + "\n" +
+                "platform: " + this.getPlatform() + "\n" +
+                "releaseDate: " + this.getReleaseDate() + "\n";
+    }
 }
 

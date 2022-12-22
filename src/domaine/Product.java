@@ -20,6 +20,9 @@ public abstract class Product {
     @BsonProperty("pricing")
     private Pricing pricing;
 
+    @BsonProperty("rating")
+    private Rating rating;
+
     @BsonCreator
     public Product(@BsonProperty("_id") ObjectId id,
                    @BsonProperty("title") String title,
@@ -63,5 +66,13 @@ public abstract class Product {
         this.pricing = pricing;
     }
 
+    public Rating getRating() { return rating; }
 
+    public void setRating(Rating rating) { this.rating = rating; }
+
+    @Override
+    public String toString() {
+        return "id: " + this.getId() + "\n" +
+                "title: " + this.getTitle() + "\n";
+    }
 }

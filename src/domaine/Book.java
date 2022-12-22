@@ -98,4 +98,13 @@ public class Book extends Product{
     public void setNumPages(int numPages) {
         this.numPages = numPages;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() +
+                "type: Book\n" +
+                "authors: " + authors + "\n" +
+                "releaseDate: " + releaseDate + "\n" +
+                "publisher: " + publisher + "\n";
+    }
 }

@@ -55,7 +55,8 @@ public class DataLoader {
                         .append("avg_rating", parseDoubleStringWithComma(book[3]))
                         .append("nb_rating", Integer.parseInt(book[8]))
                         .append("nb_review", Integer.parseInt(book[9]))
-                );
+                )
+                .append("worldwide_sales", generateRandomIntInRange(10*(int)Math.pow(10.0, 6.0),100*(int)Math.pow(10.0, 6.0)));
         return d;
     }
 
@@ -83,8 +84,9 @@ public class DataLoader {
                 .append("genres", Arrays.asList(movie[5].split(", ")))
                 .append("direction", movie[9])
                 .append("cast", Arrays.asList(movie[10], movie[11], movie[12], movie[13]));
+
                 if(Integer.parseInt(movie[15]) > 0){
-                    d.append("gross", Integer.parseInt(movie[15]));
+                    d.append("worldwide_sales", Integer.parseInt(movie[15]));
                 }
 
                 d.append("rating", new Document()
@@ -124,7 +126,8 @@ public class DataLoader {
                     .append("nb_rating", Integer.parseInt(album[7]))
                     .append("nb_review", Integer.parseInt(album[8]))
                     .append("rolling_stone_ranking", Integer.parseInt(album[0]))
-                );
+                )
+                .append("worldwide_sales", generateRandomIntInRange(1*(int)Math.pow(10.0, 6.0),50*(int)Math.pow(10.0, 6.0)));;
         return d;
     }
 
@@ -148,13 +151,16 @@ public class DataLoader {
                 .append("release_date", Integer.parseInt(videoGame[3]))
                 .append("genres", Arrays.asList(videoGame[4]))
                 .append("publisher", videoGame[5])
-                .append("sales", new Document()
+                .append("worldwide_sales", parseDoubleStringWithComma(videoGame[10])* Math.pow(10.0, 6.0));
+
+
+/*                .append("sales", new Document()
                         .append("noam", parseDoubleStringWithComma(videoGame[6]) * Math.pow(10.0, 6.0))
                         .append("eu", parseDoubleStringWithComma(videoGame[7]) * Math.pow(10.0, 6.0))
                         .append("jpn", parseDoubleStringWithComma(videoGame[8]) * Math.pow(10.0, 6.0))
                         .append("oth", parseDoubleStringWithComma(videoGame[9]) * Math.pow(10.0, 6.0))
                         .append("total", parseDoubleStringWithComma(videoGame[10])* Math.pow(10.0, 6.0))
-                );
+                );*/
         return d;
     }
 

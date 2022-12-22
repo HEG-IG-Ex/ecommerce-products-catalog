@@ -67,4 +67,12 @@ public class Album extends Product{
     public void setDescriptors(List<String> descriptors) {
         this.descriptors = descriptors;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() +
+                "type: Album\n" +
+                "artist: " + artist + "\n" +
+                "releaseDate: " + releaseDate + "\n";
+    }
 }

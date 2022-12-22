@@ -67,12 +67,6 @@ public class Bdd {
                                                       .readTimeout(5, TimeUnit.SECONDS)
                                                       .build();
 
-
-        //ClassModel<Product> productModel = ClassModel.builder(Product.class).conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION)).build();
-        //ClassModel<Movie> movieModel = ClassModel.builder(Movie.class).conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION)).build();
-        //PojoCodecProvider customPojoCodecProvider = PojoCodecProvider.builder().register(productModel, movieModel).build();
-        //PojoCodecProvider defaultPojoCodecProvider = PojoCodecProvider.builder().automatic(false).register(Product.class, Movie.class, Book.class, Album.class, Shipping.class, Pricing.class).conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION)).build();
-
         PojoCodecProvider defaultPojoCodecProvider = PojoCodecProvider.builder().automatic(true).conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION)).build();
 
 
@@ -81,31 +75,12 @@ public class Bdd {
 
         CodecRegistry pojoCodecRegistry = CodecRegistries.fromRegistries(defaultCodecRegistry, fromProvider);
 
-/*
-        ClassModel<Product> productModel = ClassModel.builder(Product.class).conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION)).build();
-        ClassModel<Album> albumModel = ClassModel.builder(Album.class).conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION)).enableDiscriminator(true).build();
-        ClassModel<Book> bookModel = ClassModel.builder(Book.class).conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION)).enableDiscriminator(true).build();
-        ClassModel<Movie> movieModel = ClassModel.builder(Movie.class).conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION)).enableDiscriminator(true).build();
-        ClassModel<VideoGame> videoGameModel = ClassModel.builder(VideoGame.class).conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION)).enableDiscriminator(true).build();
-        ClassModel<Pricing> pricingModel = ClassModel.builder(Pricing.class).conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION)).build();
-        ClassModel<Shipping> shippingModel = ClassModel.builder(Shipping.class).conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION)).build();
-        PojoCodecProvider customPojoCodecProvider = PojoCodecProvider.builder().register(productModel, albumModel, bookModel, movieModel, videoGameModel, pricingModel, shippingModel).build();
-        PojoCodecProvider defaultPojoCodecProvider = PojoCodecProvider.builder().automatic(true).conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION)).build();
-        CodecRegistry defaultCodecRegistry = MongoClientSettings.getDefaultCodecRegistry();
-        CodecRegistry fromProvider = CodecRegistries.fromProviders(defaultPojoCodecProvider, customPojoCodecProvider);
-        CodecRegistry pojoCodecRegistry = CodecRegistries.fromRegistries(defaultCodecRegistry, fromProvider);
-
-*/
-
-
         MongoClientSettings clientSettings = MongoClientSettings.builder()
                                                                 .applyConnectionString(connectionString)
                                                                 .applyToConnectionPoolSettings(builder -> builder.applySettings(connectionPoolSettings))
                                                                 .applyToSocketSettings(builder -> builder.applySettings(socketSettings))
                                                                 .codecRegistry(pojoCodecRegistry)
                                                                 .build();
-
-
 
         client = MongoClients.create(clientSettings);
     }
