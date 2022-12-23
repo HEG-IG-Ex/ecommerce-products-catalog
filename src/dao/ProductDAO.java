@@ -2,6 +2,7 @@ package dao;
 
 import aggregation.MarginPerPeriod;
 import aggregation.MostPopularGenre;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.*;
 import domaine.Product;
@@ -47,8 +48,14 @@ public class ProductDAO {
         MongoCollection<Product> products = bdd.getDatabase().getCollection("products", Product.class);
         Bson filter = Filters.text(whatStringDoISearch);
 
+        Bson metaTextScoreSort = Sorts.metaTextScore("score");
+        Bson metaTextScoreProj = Projections.metaTextScore("score");
+
         if(manageTextIndex(products, typeSearch)){
-            ArrayList<Product> foundProducts = products.find(filter).into(new ArrayList<>());
+            ArrayList<Product> foundProducts = products.find(filter)
+                    .projection(metaTextScoreProj)
+                    .sort(metaTextScoreSort)
+                    .into(new ArrayList<>());
             return foundProducts;
         }
         return null;
@@ -122,7 +129,7 @@ public class ProductDAO {
     /*==============================================
         AGGREGATION PIPELINE
     ================================================ */
-    private static List<Bson> prepareAggregationPipelineForMarginByReleaseDate(){
+        private static List<Bson> prepareAggregationPipelineForMarginByReleaseDate(){
 
         Bson project = new Document("$project", new Document("title", 1L)
                 .append("_cls", 1L)
@@ -132,6 +139,7 @@ public class ProductDAO {
                                 new Document("$year", "$release_date"))))
                 .append("margin",
                         new Document("$subtract", Arrays.asList("$pricing.selling_price", "$pricing.buying_price"))));
+
         Bson bucket = new Document("$bucket",
                 new Document("groupBy", "$release_date")
                         .append("boundaries", Arrays.asList(1890L, 1900L, 1910L, 1920L, 1930L, 1940L, 1950L, 1960L, 1970L, 1980L, 1990L, 2000L, 2010L, 2020L, 2030L))

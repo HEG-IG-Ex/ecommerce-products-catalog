@@ -67,7 +67,9 @@ public class Bdd {
                                                       .readTimeout(5, TimeUnit.SECONDS)
                                                       .build();
 
-        PojoCodecProvider defaultPojoCodecProvider = PojoCodecProvider.builder().automatic(true).conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION)).build();
+        PojoCodecProvider defaultPojoCodecProvider = PojoCodecProvider.builder()
+                                                                      .automatic(true)
+                                                                      .conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION)).build();
 
 
         CodecRegistry fromProvider = CodecRegistries.fromProviders(defaultPojoCodecProvider);

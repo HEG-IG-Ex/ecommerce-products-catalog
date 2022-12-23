@@ -31,13 +31,13 @@ public class Application {
 
         // Clear Products Collection
         bdd = Bdd.getInstance();
-        /*bdd.getCollection("products").deleteMany(new Document());
+        bdd.getCollection("products").deleteMany(new Document());
 
         // Load Data
         loadMovies();
         loadAlbums();
         loadBooks();
-        loadVideoGames();*/
+        loadVideoGames();
 
         // Execute Queries
 
@@ -73,7 +73,6 @@ public class Application {
             System.out.println(i + ". " + marginPerPeriods.get(i).toString());
         }
 
-
         // Close DB instance
         bdd.closeClient();
 
@@ -83,6 +82,7 @@ public class Application {
         //SRC : https://mongodb.github.io/mongo-java-driver/3.9/driver/getting-started/quick-start-pojo/
         //SRC : https://www.mongodb.com/developer/languages/java/java-aggregation-pipeline/
         //SRC : https://zx77.medium.com/mongodb-java-driver-for-polymorphism-8d8a9e28ec24
+        //SRC : https://www.mongodb.com/docs/drivers/java/sync/v4.3/fundamentals/crud/read-operations/sort/
 
     }
 }
